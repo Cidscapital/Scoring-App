@@ -45,9 +45,9 @@ To set up and run the Scoring Application locally, follow these steps:
 
 5. **Run the Application**:
    - Open a browser and navigate to respective URLs for the following:
-     - Scoreboard
-     - Judge Portal
-     - Admin Dashboard
+     - [Scoreboard] (https://scoringapp.unaux.com/index.php)
+     - [Judge Portal] (https://scoringapp.unaux.com/judge.php)
+     - [Admin Dashboard] (https://scoringapp.unaux.com/admin.php)
    - The scoreboard auto-refreshes every 10 seconds; the judge portal allows score management without login (via judge ID selection).
 
 6. **Testing**:
