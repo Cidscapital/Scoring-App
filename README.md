@@ -6,6 +6,8 @@ Welcome to the Scoring Application, a LAMP (Linux, Apache, MySQL, PHP) stack-bas
 
 ## Setup Instructions
 
+**Live App**: https://scoringapp.unaux.com/
+
 To set up and run the Scoring Application locally, follow these steps:
 
 ### Prerequisites
@@ -45,9 +47,9 @@ To set up and run the Scoring Application locally, follow these steps:
 
 5. **Run the Application**:
    - Open a browser and navigate to respective URLs for the following:
-     - [Scoreboard] (https://scoringapp.unaux.com/index.php)
-     - [Judge Portal] (https://scoringapp.unaux.com/judge.php)
-     - [Admin Dashboard] (https://scoringapp.unaux.com/admin.php)
+     - [Scoreboard](https://scoringapp.unaux.com/index.php)
+     - [Judge Portal](https://scoringapp.unaux.com/judge.php)
+     - [Admin Dashboard](https://scoringapp.unaux.com/admin.php)
    - The scoreboard auto-refreshes every 10 seconds; the judge portal allows score management without login (via judge ID selection).
 
 6. **Testing**:
