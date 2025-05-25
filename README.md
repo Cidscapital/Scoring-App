@@ -6,6 +6,8 @@ Welcome to the Scoring Application, a LAMP (Linux, Apache, MySQL, PHP) stack-bas
 
 ## Setup Instructions
 
+**Live App**: https://scoringapp.unaux.com/
+
 To set up and run the Scoring Application locally, follow these steps:
 
 ### Prerequisites
@@ -18,14 +20,14 @@ To set up and run the Scoring Application locally, follow these steps:
 1. **Clone or Download the Repository**:
    - Clone the repository to your local machine:
      ```bash
-     git clone https://github.com/yourusername/scoring-app.git
-     cd scoring-app
+     git clone https://github.com/Cidscapital/Scoring-App.git
+     cd Scoring-App
      ```
    - Alternatively, download the ZIP file and extract it to your XAMPP `htdocs` directory (e.g., `/opt/lampp/htdocs/scoring_app` on Linux or `C:\xampp\htdocs\scoring_app` on Windows).
 
 2. **Configure the Database**:
    - Start XAMPP: `sudo /opt/lampp/lampp start` (Linux) or use the XAMPP Control Panel (Windows).
-   - Access phpMyAdmin at `[invalid url, do not cite]` and create a database named `scoring_app`.
+   - Access phpMyAdmin and create a database named `scoring_app`.
    - Import the SQL schema below into the `scoring_app` database.
 
 3. **Set Up Database Connection**:
@@ -45,9 +47,9 @@ To set up and run the Scoring Application locally, follow these steps:
 
 5. **Run the Application**:
    - Open a browser and navigate to respective URLs for the following:
-     - Scoreboard
-     - Judge Portal
-     - Admin Dashboard
+     - [Scoreboard](https://scoringapp.unaux.com/index.php)
+     - [Judge Portal](https://scoringapp.unaux.com/judge.php)
+     - [Admin Dashboard](https://scoringapp.unaux.com/admin.php)
    - The scoreboard auto-refreshes every 10 seconds; the judge portal allows score management without login (via judge ID selection).
 
 6. **Testing**:
