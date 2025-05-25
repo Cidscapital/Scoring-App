@@ -264,6 +264,13 @@
                 .then(data => {
                     const top3Container = document.getElementById('top3');
                     top3Container.innerHTML = '';
+                    // Sort data by total_score descending, then by name for tie-breaker
+                    data.sort((a, b) => {
+                        if (b.total_score !== a.total_score) {
+                            return b.total_score - a.total_score;
+                        }
+                        return a.name.localeCompare(b.name);
+                    });
                     for (let i = 0; i < 3; i++) {
                         if (data[i]) {
                             const participant = data[i];
@@ -282,12 +289,21 @@
                     const tbody = document.getElementById('scoreboard-body');
                     tbody.innerHTML = '';
                     let currentRank = 1;
-                    let prevScore = data.length > 0 ? data[0].total_score : null;
+                    let prevScore = null;
+                    let prevRank = 1;
                     data.forEach((participant, index) => {
-                        if (index > 0 && participant.total_score < prevScore) {
+                        // If first row, always rank 1
+                        if (index === 0) {
+                            currentRank = 1;
+                        } else if (participant.total_score === prevScore) {
+                            // Same score as previous, same rank
+                            currentRank = prevRank;
+                        } else {
+                            // Otherwise, rank is index+1
                             currentRank = index + 1;
                         }
                         prevScore = participant.total_score;
+                        prevRank = currentRank;
                         const row = document.createElement('tr');
                         row.className = index % 2 === 0 ? 'odd' : 'even';
                         row.innerHTML = `

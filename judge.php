@@ -364,22 +364,32 @@ if (!isset($_SESSION['judge_id'])) {
                     <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Scoring Analytics</h2>
                     <canvas id="score-chart" width="400" height="200"></canvas>
                 </div>
-                <div id="edit-score-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-                    <div class="modal p-6 rounded-lg w-full max-w-md">
-                        <h2 class="text-xl font-bold text-white mb-4">Edit Score</h2>
-                        <form id="edit-score-form">
-                            <div class="form-group">
-                                <input type="text" id="edit-participant-id" readonly class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
-                                <label for="edit-participant-id">Participant ID</label>
-                            </div>
-                            <div class="form-group">
-                                <input type="number" id="edit-score" placeholder=" " required min="1" max="10" class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
-                                <label for="edit-score">Score (1-10)</label>
-                            </div>
-                            <button type="submit" class="btn-glow">Save</button>
-                            <button type="button" id="close-score-modal" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
-                        </form>
+                <!-- Edit Score Modal (Bootstrap, improved) -->
+                <div class="modal fade" id="editScoreModal" tabindex="-1" aria-labelledby="editScoreModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="background: #23272f; border-radius: 1rem; border: none;">
+                      <div class="modal-header border-0" style="border-bottom: 1px solid #333;">
+                        <h5 class="modal-title text-white" id="editScoreModalLabel">Edit Score</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form id="edit-score-form">
+                        <div class="modal-body">
+                          <div class="form-group mb-3">
+                            <input type="text" id="edit-participant-id" readonly class="form-control bg-gray-700 text-white border-0" style="background:#374151;">
+                            <label for="edit-participant-id" class="form-label text-secondary">Participant ID</label>
+                          </div>
+                          <div class="form-group mb-3">
+                            <input type="number" id="edit-score" placeholder=" " required min="1" max="10" class="form-control bg-gray-700 text-white border-0" style="background:#374151;">
+                            <label for="edit-score" class="form-label text-secondary">Score (1-10)</label>
+                          </div>
+                        </div>
+                        <div class="modal-footer border-0 d-flex justify-content-between">
+                          <button type="submit" class="btn btn-danger btn-glow">Save</button>
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                      </form>
                     </div>
+                  </div>
                 </div>
             <?php endif; ?>
         </main>
@@ -472,7 +482,7 @@ if (!isset($_SESSION['judge_id'])) {
                             scoresTbody.appendChild(row);
                         });
 
-                        // Use jQuery for DataTables check and initialization
+                        // DataTables
                         if (window.jQuery && window.jQuery.fn && window.jQuery.fn.DataTable && window.jQuery.fn.DataTable.isDataTable('#scores-table')) {
                             $('#scores-table').DataTable().destroy();
                         }
@@ -495,7 +505,6 @@ if (!isset($_SESSION['judge_id'])) {
                                 }
                             },
                             createdRow: function(row, data, dataIndex) {
-                                // Apply color classes for even/odd rows
                                 if (dataIndex % 2 === 0) {
                                     row.classList.add('odd');
                                 } else {
@@ -504,18 +513,21 @@ if (!isset($_SESSION['judge_id'])) {
                             }
                         });
 
+                        // Bind edit buttons
                         document.querySelectorAll('.edit-score').forEach(btn => {
-                            btn.addEventListener('click', function() {
+                            btn.onclick = function() {
                                 const participantId = this.getAttribute('data-participant-id');
                                 const score = this.getAttribute('data-score');
                                 document.getElementById('edit-participant-id').value = participantId;
                                 document.getElementById('edit-score').value = score;
-                                document.getElementById('edit-score-modal').classList.remove('hidden');
-                            });
+                                var modal = new bootstrap.Modal(document.getElementById('editScoreModal'));
+                                modal.show();
+                            };
                         });
 
+                        // Bind delete buttons
                         document.querySelectorAll('.delete-score').forEach(btn => {
-                            btn.addEventListener('click', function() {
+                            btn.onclick = function() {
                                 const participantId = this.getAttribute('data-participant-id');
                                 if (confirm(`Are you sure you want to delete the score for participant ${participantId}?`)) {
                                     fetch('api/delete_score.php', {
@@ -536,7 +548,7 @@ if (!isset($_SESSION['judge_id'])) {
                                             console.error(error);
                                         });
                                 }
-                            });
+                            };
                         });
                     })
                     .catch(error => {
@@ -622,38 +634,40 @@ if (!isset($_SESSION['judge_id'])) {
                     });
             });
 
-            document.getElementById('edit-score-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const participantId = document.getElementById('edit-participant-id').value;
-                const score = document.getElementById('edit-score').value;
+            document.addEventListener('DOMContentLoaded', function() {
+                var editScoreForm = document.getElementById('edit-score-form');
+                if (editScoreForm) {
+                    editScoreForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const participantId = document.getElementById('edit-participant-id').value;
+                        const score = document.getElementById('edit-score').value;
 
-                if (score < 1 || score > 10) {
-                    showToast('Please enter a score between 1 and 10', 'error');
-                    return;
-                }
-
-                fetch('api/update_score.php', {
-                    method: 'POST',
-                    body: new URLSearchParams({ participant_id: participantId, score: score })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showToast('Score updated successfully', 'success');
-                            document.getElementById('edit-score-modal').classList.add('hidden');
-                            loadData();
-                        } else {
-                            showToast(data.message || 'Error updating score', 'error');
+                        if (score < 1 || score > 10) {
+                            showToast('Please enter a score between 1 and 10', 'error');
+                            return;
                         }
-                    })
-                    .catch(error => {
-                        showToast('Error updating score', 'error');
-                        console.error(error);
-                    });
-            });
 
-            document.getElementById('close-score-modal').addEventListener('click', function() {
-                document.getElementById('edit-score-modal').classList.add('hidden');
+                        fetch('api/update_score.php', {
+                            method: 'POST',
+                            body: new URLSearchParams({ participant_id: participantId, score: score })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    showToast('Score updated successfully', 'success');
+                                    var modal = bootstrap.Modal.getInstance(document.getElementById('editScoreModal'));
+                                    if (modal) modal.hide();
+                                    loadData();
+                                } else {
+                                    showToast(data.message || 'Error updating score', 'error');
+                                }
+                            })
+                            .catch(error => {
+                                showToast('Error updating score', 'error');
+                                console.error(error);
+                            });
+                    });
+                }
             });
 
             document.getElementById('logout-btn').addEventListener('click', function() {

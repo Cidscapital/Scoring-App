@@ -392,39 +392,59 @@
               <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Score Distribution</h2>
               <canvas id="score-chart" width="400" height="200"></canvas>
           </div>
-          <div id="edit-judge-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-              <div class="modal p-6 rounded-lg w-full max-w-md">
-                  <h2 class="text-xl font-bold text-white mb-4">Edit Judge</h2>
-                  <form id="edit-judge-form">
-                      <div class="form-group">
-                          <input type="text" id="edit-judge-id" readonly class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
-                          <label for="edit-judge-id">Judge ID</label>
-                      </div>
-                      <div class="form-group">
-                          <input type="text" id="edit-judge-name" placeholder=" " required maxlength="100" class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
-                          <label for="edit-judge-name">Judge Name</label>
-                      </div>
-                      <button type="submit" class="btn-glow">Save</button>
-                      <button type="button" id="close-judge-modal" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
-                  </form>
+          <!-- Edit Judge Modal (Bootstrap, improved) -->
+          <div class="modal fade" id="editJudgeModal" tabindex="-1" aria-labelledby="editJudgeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content" style="background: #23272f; border-radius: 1rem; border: none;">
+                <div class="modal-header border-0" style="border-bottom: 1px solid #333;">
+                  <h5 class="modal-title text-white" id="editJudgeModalLabel">Edit Judge</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="edit-judge-form">
+                  <div class="modal-body">
+                    <div class="form-group mb-3">
+                      <input type="text" id="edit-judge-id" readonly class="form-control bg-gray-700 text-white border-0" style="background:#374151;">
+                      <label for="edit-judge-id" class="form-label text-secondary">Judge ID</label>
+                    </div>
+                    <div class="form-group mb-3">
+                      <input type="text" id="edit-judge-name" placeholder=" " required maxlength="100" class="form-control bg-gray-700 text-white border-0" style="background:#374151;">
+                      <label for="edit-judge-name" class="form-label text-secondary">Judge Name</label>
+                    </div>
+                  </div>
+                  <div class="modal-footer border-0 d-flex justify-content-between">
+                    <button type="submit" class="btn btn-danger btn-glow">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  </div>
+                </form>
               </div>
+            </div>
           </div>
-          <div id="edit-participant-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-              <div class="modal p-6 rounded-lg w-full max-w-md">
-                  <h2 class="text-xl font-bold text-white mb-4">Edit Participant</h2>
-                  <form id="edit-participant-form">
-                      <div class="form-group">
-                          <input type="text" id="edit-participant-id" readonly class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
-                          <label for="edit-participant-id">Participant ID</label>
-                      </div>
-                      <div class="form-group">
-                          <input type="text" id="edit-participant-name" placeholder=" " required maxlength="100" class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
-                          <label for="edit-participant-name">Participant Name</label>
-                      </div>
-                      <button type="submit" class="btn-glow">Save</button>
-                      <button type="button" id="close-participant-modal" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Cancel</button>
-                  </form>
+          <!-- Edit Participant Modal (Bootstrap, improved) -->
+          <div class="modal fade" id="editParticipantModal" tabindex="-1" aria-labelledby="editParticipantModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content" style="background: #23272f; border-radius: 1rem; border: none;">
+                <div class="modal-header border-0" style="border-bottom: 1px solid #333;">
+                  <h5 class="modal-title text-white" id="editParticipantModalLabel">Edit Participant</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="edit-participant-form">
+                  <div class="modal-body">
+                    <div class="form-group mb-3">
+                      <input type="text" id="edit-participant-id" readonly class="form-control bg-gray-700 text-white border-0" style="background:#374151;">
+                      <label for="edit-participant-id" class="form-label text-secondary">Participant ID</label>
+                    </div>
+                    <div class="form-group mb-3">
+                      <input type="text" id="edit-participant-name" placeholder=" " required maxlength="100" class="form-control bg-gray-700 text-white border-0" style="background:#374151;">
+                      <label for="edit-participant-name" class="form-label text-secondary">Participant Name</label>
+                    </div>
+                  </div>
+                  <div class="modal-footer border-0 d-flex justify-content-between">
+                    <button type="submit" class="btn btn-danger btn-glow">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  </div>
+                </form>
               </div>
+            </div>
           </div>
       </main>
   </div>
@@ -442,10 +462,33 @@
           }).showToast();
       }
 
+      function bindEditButtons() {
+          document.querySelectorAll('.edit-judge').forEach(btn => {
+              btn.onclick = function() {
+                  const id = this.getAttribute('data-id');
+                  const name = this.getAttribute('data-name');
+                  document.getElementById('edit-judge-id').value = id;
+                  document.getElementById('edit-judge-name').value = name;
+                  var modal = new bootstrap.Modal(document.getElementById('editJudgeModal'));
+                  modal.show();
+              };
+          });
+          document.querySelectorAll('.edit-participant').forEach(btn => {
+              btn.onclick = function() {
+                  const id = this.getAttribute('data-id');
+                  const name = this.getAttribute('data-name');
+                  document.getElementById('edit-participant-id').value = id;
+                  document.getElementById('edit-participant-name').value = name;
+                  var modal = new bootstrap.Modal(document.getElementById('editParticipantModal'));
+                  modal.show();
+              };
+          });
+      }
+
       function loadData() {
           fetch('api/get_dashboard_data.php')
               .then(response => response.json())
-              .then(data => {
+              .then(function(data) { // <-- fix: wrap function in parentheses
                   document.getElementById('total-judges').textContent = data.counts.total_judges;
                   document.getElementById('total-participants').textContent = data.counts.total_participants;
                   document.getElementById('total-scores').textContent = data.counts.total_scores;
@@ -544,15 +587,7 @@
                       }
                   });
 
-                  document.querySelectorAll('.edit-judge').forEach(btn => {
-                      btn.addEventListener('click', function() {
-                          const id = this.getAttribute('data-id');
-                          const name = this.getAttribute('data-name');
-                          document.getElementById('edit-judge-id').value = id;
-                          document.getElementById('edit-judge-name').value = name;
-                          document.getElementById('edit-judge-modal').classList.remove('hidden');
-                      });
-                  });
+                  bindEditButtons();
 
                   document.querySelectorAll('.delete-judge').forEach(btn => {
                       btn.addEventListener('click', function() {
@@ -576,16 +611,6 @@
                                       console.error(error);
                                   });
                           }
-                      });
-                  });
-
-                  document.querySelectorAll('.edit-participant').forEach(btn => {
-                      btn.addEventListener('click', function() {
-                          const id = this.getAttribute('data-id');
-                          const name = this.getAttribute('data-name');
-                          document.getElementById('edit-participant-id').value = id;
-                          document.getElementById('edit-participant-name').value = name;
-                          document.getElementById('edit-participant-modal').classList.remove('hidden');
                       });
                   });
 
@@ -740,72 +765,68 @@
               });
       });
 
-      document.getElementById('edit-judge-form').addEventListener('submit', function(e) {
-          e.preventDefault();
-          const id = document.getElementById('edit-judge-id').value;
-          const name = document.getElementById('edit-judge-name').value.trim();
+      document.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('edit-judge-form').addEventListener('submit', function(e) {
+              e.preventDefault();
+              const id = document.getElementById('edit-judge-id').value;
+              const name = document.getElementById('edit-judge-name').value.trim();
 
-          if (name.length < 1) {
-              showToast('Please enter a name', 'error');
-              return;
-          }
+              if (name.length < 1) {
+                  showToast('Please enter a name', 'error');
+                  return;
+              }
 
-          fetch('api/update_judge.php', {
-              method: 'POST',
-              body: new URLSearchParams({ judge_id: id, judge_name: name })
-          })
-              .then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      showToast('Judge updated successfully', 'success');
-                      document.getElementById('edit-judge-modal').classList.add('hidden');
-                      loadData();
-                  } else {
-                      showToast(data.message || 'Error updating judge', 'error');
-                  }
+              fetch('api/update_judge.php', {
+                  method: 'POST',
+                  body: new URLSearchParams({ judge_id: id, judge_name: name })
               })
-              .catch(error => {
-                  showToast('Error updating judge', 'error');
-                  console.error(error);
-              });
-      });
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          showToast('Judge updated successfully', 'success');
+                          var modal = bootstrap.Modal.getInstance(document.getElementById('editJudgeModal'));
+                          if (modal) modal.hide();
+                          loadData();
+                      } else {
+                          showToast(data.message || 'Error updating judge', 'error');
+                      }
+                  })
+                  .catch(error => {
+                      showToast('Error updating judge', 'error');
+                      console.error(error);
+                  });
+          });
 
-      document.getElementById('edit-participant-form').addEventListener('submit', function(e) {
-          e.preventDefault();
-          const id = document.getElementById('edit-participant-id').value;
-          const name = document.getElementById('edit-participant-name').value.trim();
+          document.getElementById('edit-participant-form').addEventListener('submit', function(e) {
+              e.preventDefault();
+              const id = document.getElementById('edit-participant-id').value;
+              const name = document.getElementById('edit-participant-name').value.trim();
 
-          if (name.length < 1) {
-              showToast('Please enter a name', 'error');
-              return;
-          }
+              if (name.length < 1) {
+                  showToast('Please enter a name', 'error');
+                  return;
+              }
 
-          fetch('api/update_participant.php', {
-              method: 'POST',
-              body: new URLSearchParams({ participant_id: id, participant_name: name })
-          })
-              .then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      showToast('Participant updated successfully', 'success');
-                      document.getElementById('edit-participant-modal').classList.add('hidden');
-                      loadData();
-                  } else {
-                      showToast(data.message || 'Error updating participant', 'error');
-                  }
+              fetch('api/update_participant.php', {
+                  method: 'POST',
+                  body: new URLSearchParams({ participant_id: id, participant_name: name })
               })
-              .catch(error => {
-                  showToast('Error updating participant', 'error');
-                  console.error(error);
-              });
-      });
-
-      document.getElementById('close-judge-modal').addEventListener('click', function() {
-          document.getElementById('edit-judge-modal').classList.add('hidden');
-      });
-
-      document.getElementById('close-participant-modal').addEventListener('click', function() {
-          document.getElementById('edit-participant-modal').classList.add('hidden');
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          showToast('Participant updated successfully', 'success');
+                          var modal = bootstrap.Modal.getInstance(document.getElementById('editParticipantModal'));
+                          if (modal) modal.hide();
+                          loadData();
+                      } else {
+                          showToast(data.message || 'Error updating participant', 'error');
+                      }
+                  })
+                  .catch(error => {
+                      showToast('Error updating participant', 'error');
+                      console.error(error);
+                  });
+          });
       });
 
       document.getElementById('judge-search').addEventListener('input', function() {
