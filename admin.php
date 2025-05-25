@@ -8,6 +8,13 @@
   <link href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <!-- Add Bootstrap and DataTables CSS/JS for responsive tables -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
   <style>
       :root {
           --primary-color: #D81F26; /* Netflix Red */
@@ -128,6 +135,13 @@
       }
       table {
           background: var(--table-row-odd);
+          width: 100%;
+          border-collapse: collapse;
+      }
+      th, td {
+          padding: 0.75rem;
+          text-align: left;
+          word-break: break-word;
       }
       tr:nth-child(even) {
           background: var(--table-row-even);
@@ -138,20 +152,145 @@
       #sidebar-toggle {
           display: none;
       }
+      /* DataTables and Bootstrap color overrides */
+      table.dataTable {
+          background: var(--table-row-odd) !important;
+          color: var(--text-color) !important;
+      }
+      table.dataTable thead th {
+          background: var(--table-header) !important;
+          color: var(--text-color) !important;
+      }
+      table.dataTable tbody tr.even {
+          background: var(--table-row-even) !important;
+      }
+      table.dataTable tbody tr.odd {
+          background: var(--table-row-odd) !important;
+      }
+      table.dataTable tbody tr:hover {
+          background: rgba(255,255,255,0.08) !important;
+      }
+      .dataTables_wrapper .dataTables_paginate .paginate_button {
+          color: var(--text-color) !important;
+          background: var(--background-color) !important;
+      }
+      .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+          background: var(--primary-color) !important;
+          color: #fff !important;
+      }
+      .dataTables_wrapper .dataTables_filter input,
+      .dataTables_wrapper .dataTables_length select {
+          background: var(--input-background);
+          color: var(--text-color);
+          border: 1px solid var(--input-border);
+      }
+      .dataTables_wrapper .dataTables_info,
+      .dataTables_wrapper .dataTables_paginate {
+          color: var(--secondary-text);
+      }
+      /* Remove Tailwind's table block display on mobile, keep table structure */
+      @media (max-width: 768px) {
+          table, thead, tbody, th, td, tr {
+              display: table !important;
+              width: 100% !important;
+          }
+      }
+      @media (max-width: 1024px) {
+          .glassmorphism, .header-gradient {
+              padding: 1rem !important;
+          }
+          main {
+              padding: 1rem !important;
+          }
+      }
+      @media (max-width: 900px) {
+          .grid-cols-3 {
+              grid-template-columns: 1fr !important;
+          }
+      }
       @media (max-width: 768px) {
           aside {
               transform: translateX(-100%);
               position: fixed;
               z-index: 50;
+              width: 80vw;
+              min-width: 220px;
+              max-width: 320px;
+              height: 100vh;
+              top: 0;
+              left: 0;
+              background: #1A1A1A;
+              box-shadow: 2px 0 10px rgba(0,0,0,0.2);
           }
           aside.open {
               transform: translateX(0);
           }
           main {
               margin-left: 0;
+              padding: 0.5rem !important;
           }
           #sidebar-toggle {
               display: block;
+          }
+          .glassmorphism, .header-gradient {
+              padding: 0.5rem !important;
+          }
+          .grid-cols-3 {
+              grid-template-columns: 1fr !important;
+          }
+          .overflow-x-auto {
+              overflow-x: auto;
+          }
+          table, thead, tbody, th, td, tr {
+              display: block;
+              width: 100%;
+          }
+          thead {
+              display: none;
+          }
+          tr {
+              margin-bottom: 1.5rem;
+              background: var(--card-background);
+              border-radius: 0.75rem;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+              padding: 0.5rem 0;
+          }
+          td {
+              position: relative;
+              padding-left: 45%;
+              padding-right: 1rem;
+              text-align: left;
+              border: none;
+              min-height: 40px;
+              box-sizing: border-box;
+              background: none;
+          }
+          td:before {
+              content: attr(data-label);
+              position: absolute;
+              left: 1rem;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 40%;
+              font-weight: bold;
+              color: var(--secondary-text);
+              white-space: nowrap;
+              text-align: left;
+              pointer-events: none;
+          }
+      }
+      @media (max-width: 480px) {
+          .glassmorphism, .header-gradient {
+              padding: 0.25rem !important;
+          }
+          main {
+              padding: 0.25rem !important;
+          }
+          td {
+              padding-left: 50%;
+          }
+          td:before {
+              width: 48%;
           }
       }
   </style>
@@ -160,7 +299,7 @@
   <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 bg-red-600 text-white p-2 rounded">
       ☰
   </button>
-  <div class="flex min-h-screen">
+  <div class="flex min-h-screen flex-col md:flex-row">
       <aside class="w-64 p-4 h-full" id="sidebar">
           <h2 class="text-2xl font-bold text-white mb-6 animate-fade-in">Navigation</h2>
           <ul class="space-y-4">
@@ -171,11 +310,11 @@
       </aside>
       <main class="flex-1 p-6">
           <header class="header-gradient mb-8 animate-fade-in">
-              <h1 class="text-4xl font-bold text-white">Admin Panel</h1>
-              <p class="text-gray-300">Manage judges and participants for the scoring system</p>
+              <h1 class="text-4xl font-bold text-white text-center md:text-left">Admin Panel</h1>
+              <p class="text-gray-300 text-center md:text-left">Manage judges and participants for the scoring system</p>
           </header>
           <div class="glassmorphism p-6 mb-8 animate-fade-in">
-              <h2 class="text-2xl font-semibold text-white mb-4">Dashboard Overview</h2>
+              <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Dashboard Overview</h2>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div class="glassmorphism p-4">
                       <h3 class="text-lg font-semibold text-red-500">Total Judges</h3>
@@ -192,23 +331,23 @@
               </div>
           </div>
           <div class="glassmorphism p-6 mb-8 animate-fade-in">
-              <h2 class="text-2xl font-semibold text-white mb-4">Manage Judges</h2>
+              <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Manage Judges</h2>
               <input type="text" id="judge-search" placeholder="Search judges..." class="w-full p-2 mb-4 bg-gray-700 text-white border border-gray-600 rounded">
-              <form id="add-judge-form" class="mb-6">
-                  <div class="form-group">
+              <form id="add-judge-form" class="mb-6 flex flex-col md:flex-row md:items-end gap-4">
+                  <div class="form-group flex-1">
                       <input type="text" id="judge-id" name="judge_id" placeholder=" " required maxlength="50">
                       <label for="judge-id">Judge ID</label>
                   </div>
-                  <div class="form-group">
+                  <div class="form-group flex-1">
                       <input type="text" id="judge-name" name="judge_name" placeholder=" " required maxlength="100">
                       <label for="judge-name">Judge Name</label>
                   </div>
-                  <button type="submit" class="btn-glow">
+                  <button type="submit" class="btn-glow w-full md:w-auto">
                       Add Judge <span class="spinner"></span>
                   </button>
               </form>
               <div class="overflow-x-auto">
-                  <table class="min-w-full">
+                  <table id="judges-table" class="min-w-full table table-striped table-bordered" style="width:100%">
                       <thead>
                           <tr>
                               <th class="py-3 px-4 text-left text-white">ID</th>
@@ -221,23 +360,23 @@
               </div>
           </div>
           <div class="glassmorphism p-6 mb-8 animate-fade-in">
-              <h2 class="text-2xl font-semibold text-white mb-4">Manage Participants</h2>
+              <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Manage Participants</h2>
               <input type="text" id="participant-search" placeholder="Search participants..." class="w-full p-2 mb-4 bg-gray-700 text-white border border-gray-600 rounded">
-              <form id="add-participant-form" class="mb-6">
-                  <div class="form-group">
+              <form id="add-participant-form" class="mb-6 flex flex-col md:flex-row md:items-end gap-4">
+                  <div class="form-group flex-1">
                       <input type="text" id="participant-id" name="participant_id" placeholder=" " required maxlength="50">
                       <label for="participant-id">Participant ID</label>
                   </div>
-                  <div class="form-group">
+                  <div class="form-group flex-1">
                       <input type="text" id="participant-name" name="participant_name" placeholder=" " required maxlength="100">
                       <label for="participant-name">Participant Name</label>
                   </div>
-                  <button type="submit" class="btn-glow">
+                  <button type="submit" class="btn-glow w-full md:w-auto">
                       Add Participant <span class="spinner"></span>
                   </button>
               </form>
               <div class="overflow-x-auto">
-                  <table class="min-w-full">
+                  <table id="participants-table" class="min-w-full table table-striped table-bordered" style="width:100%">
                       <thead>
                           <tr>
                               <th class="py-3 px-4 text-left text-white">ID</th>
@@ -250,19 +389,19 @@
               </div>
           </div>
           <div class="glassmorphism p-6 animate-fade-in">
-              <h2 class="text-2xl font-semibold text-white mb-4">Score Distribution</h2>
+              <h2 class="text-2xl font-semibold text-white mb-4 text-center md:text-left">Score Distribution</h2>
               <canvas id="score-chart" width="400" height="200"></canvas>
           </div>
-          <div id="edit-judge-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-              <div class="modal p-6 rounded-lg w-full max-w-md">
+          <div id="edit-judge-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center d-none" style="display:none;">
+              <div class="modal p-6 rounded-lg w-full max-w-md bg-gray-800">
                   <h2 class="text-xl font-bold text-white mb-4">Edit Judge</h2>
                   <form id="edit-judge-form">
                       <div class="form-group">
-                          <input type="text" id="edit-judge-id" readonly class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
+                          <input type="text" id="edit-judge-id" readonly class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded" name="edit_judge_id">
                           <label for="edit-judge-id">Judge ID</label>
                       </div>
                       <div class="form-group">
-                          <input type="text" id="edit-judge-name" placeholder=" " required maxlength="100" class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
+                          <input type="text" id="edit-judge-name" placeholder=" " required maxlength="100" class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded" name="edit_judge_name">
                           <label for="edit-judge-name">Judge Name</label>
                       </div>
                       <button type="submit" class="btn-glow">Save</button>
@@ -270,16 +409,16 @@
                   </form>
               </div>
           </div>
-          <div id="edit-participant-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
-              <div class="modal p-6 rounded-lg w-full max-w-md">
+          <div id="edit-participant-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center d-none" style="display:none;">
+              <div class="modal p-6 rounded-lg w-full max-w-md bg-gray-800">
                   <h2 class="text-xl font-bold text-white mb-4">Edit Participant</h2>
                   <form id="edit-participant-form">
                       <div class="form-group">
-                          <input type="text" id="edit-participant-id" readonly class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
+                          <input type="text" id="edit-participant-id" readonly class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded" name="edit_participant_id">
                           <label for="edit-participant-id">Participant ID</label>
                       </div>
                       <div class="form-group">
-                          <input type="text" id="edit-participant-name" placeholder=" " required maxlength="100" class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded">
+                          <input type="text" id="edit-participant-name" placeholder=" " required maxlength="100" class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded" name="edit_participant_name">
                           <label for="edit-participant-name">Participant Name</label>
                       </div>
                       <button type="submit" class="btn-glow">Save</button>
@@ -313,15 +452,15 @@
 
                   const judgesTbody = document.getElementById('judges-table-body');
                   judgesTbody.innerHTML = '';
-                  data.judges.forEach(judge => {
+                  data.judges.forEach((judge, idx) => {
                       const row = document.createElement('tr');
-                      row.className = 'table-row';
+                      row.className = idx % 2 === 0 ? 'odd' : 'even';
                       row.innerHTML = `
-                          <td class="py-2 px-4">${judge.id}</td>
-                          <td class="py-2 px-4">${judge.name}</td>
-                          <td class="py-2 px-4">
-                              <button class="edit-judge text-blue-400 hover:text-blue-300" data-id="${judge.id}" data-name="${judge.name}">Edit</button>
-                              <button class="delete-judge text-red-400 hover:text-red-300 ml-2" data-id="${judge.id}">Delete</button>
+                          <td>${judge.id}</td>
+                          <td>${judge.name}</td>
+                          <td>
+                              <button class="edit-judge text-blue-400 hover:text-blue-300 btn btn-sm btn-link" data-id="${judge.id}" data-name="${judge.name}">Edit</button>
+                              <button class="delete-judge text-red-400 hover:text-red-300 ml-2 btn btn-sm btn-link" data-id="${judge.id}">Delete</button>
                           </td>
                       `;
                       judgesTbody.appendChild(row);
@@ -329,18 +468,80 @@
 
                   const participantsTbody = document.getElementById('participants-table-body');
                   participantsTbody.innerHTML = '';
-                  data.participants.forEach(participant => {
+                  data.participants.forEach((participant, idx) => {
                       const row = document.createElement('tr');
-                      row.className = 'table-row';
+                      row.className = idx % 2 === 0 ? 'odd' : 'even';
                       row.innerHTML = `
-                          <td class="py-2 px-4">${participant.id}</td>
-                          <td class="py-2 px-4">${participant.name}</td>
-                          <td class="py-2 px-4">
-                              <button class="edit-participant text-blue-400 hover:text-blue-300" data-id="${participant.id}" data-name="${participant.name}">Edit</button>
-                              <button class="delete-participant text-red-400 hover:text-red-300 ml-2" data-id="${participant.id}">Delete</button>
+                          <td>${participant.id}</td>
+                          <td>${participant.name}</td>
+                          <td>
+                              <button class="edit-participant text-blue-400 hover:text-blue-300 btn btn-sm btn-link" data-id="${participant.id}" data-name="${participant.name}">Edit</button>
+                              <button class="delete-participant text-red-400 hover:text-red-300 ml-2 btn btn-sm btn-link" data-id="${participant.id}">Delete</button>
                           </td>
                       `;
                       participantsTbody.appendChild(row);
+                  });
+
+                  // DataTables for Judges
+                  if (window.jQuery && window.jQuery.fn && window.jQuery.fn.DataTable && window.jQuery.fn.DataTable.isDataTable('#judges-table')) {
+                      $('#judges-table').DataTable().destroy();
+                  }
+                  $('#judges-table').DataTable({
+                      responsive: true,
+                      paging: true,
+                      searching: true,
+                      ordering: true,
+                      info: true,
+                      autoWidth: false,
+                      lengthMenu: [5, 10, 25, 50],
+                      pageLength: 10,
+                      language: {
+                          search: "Search:",
+                          lengthMenu: "Show _MENU_ entries",
+                          info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                          paginate: {
+                              previous: "Prev",
+                              next: "Next"
+                          }
+                      },
+                      createdRow: function(row, data, dataIndex) {
+                          if (dataIndex % 2 === 0) {
+                              row.classList.add('odd');
+                          } else {
+                              row.classList.add('even');
+                          }
+                      }
+                  });
+
+                  // DataTables for Participants
+                  if (window.jQuery && window.jQuery.fn && window.jQuery.fn.DataTable && window.jQuery.fn.DataTable.isDataTable('#participants-table')) {
+                      $('#participants-table').DataTable().destroy();
+                  }
+                  $('#participants-table').DataTable({
+                      responsive: true,
+                      paging: true,
+                      searching: true,
+                      ordering: true,
+                      info: true,
+                      autoWidth: false,
+                      lengthMenu: [5, 10, 25, 50],
+                      pageLength: 10,
+                      language: {
+                          search: "Search:",
+                          lengthMenu: "Show _MENU_ entries",
+                          info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                          paginate: {
+                              previous: "Prev",
+                              next: "Next"
+                          }
+                      },
+                      createdRow: function(row, data, dataIndex) {
+                          if (dataIndex % 2 === 0) {
+                              row.classList.add('odd');
+                          } else {
+                              row.classList.add('even');
+                          }
+                      }
                   });
 
                   document.querySelectorAll('.edit-judge').forEach(btn => {
@@ -349,7 +550,7 @@
                           const name = this.getAttribute('data-name');
                           document.getElementById('edit-judge-id').value = id;
                           document.getElementById('edit-judge-name').value = name;
-                          document.getElementById('edit-judge-modal').classList.remove('hidden');
+                          showEditJudgeModal();
                       });
                   });
 
@@ -384,7 +585,7 @@
                           const name = this.getAttribute('data-name');
                           document.getElementById('edit-participant-id').value = id;
                           document.getElementById('edit-participant-name').value = name;
-                          document.getElementById('edit-participant-modal').classList.remove('hidden');
+                          showEditParticipantModal();
                       });
                   });
 
@@ -600,11 +801,22 @@
       });
 
       document.getElementById('close-judge-modal').addEventListener('click', function() {
-          document.getElementById('edit-judge-modal').classList.add('hidden');
+          hideEditJudgeModal();
+      });
+      document.getElementById('close-participant-modal').addEventListener('click', function() {
+          hideEditParticipantModal();
       });
 
-      document.getElementById('close-participant-modal').addEventListener('click', function() {
-          document.getElementById('edit-participant-modal').classList.add('hidden');
+      // Also close modals when clicking outside the modal content
+      document.getElementById('edit-judge-modal').addEventListener('mousedown', function(e) {
+          if (e.target === this) {
+              hideEditJudgeModal();
+          }
+      });
+      document.getElementById('edit-participant-modal').addEventListener('mousedown', function(e) {
+          if (e.target === this) {
+              hideEditParticipantModal();
+          }
       });
 
       document.getElementById('judge-search').addEventListener('input', function() {
@@ -630,6 +842,24 @@
       document.getElementById('sidebar-toggle').addEventListener('click', function() {
           const sidebar = document.getElementById('sidebar');
           sidebar.classList.toggle('open');
+      });
+
+      // Sidebar close on outside click (mobile)
+      document.addEventListener('click', function(e) {
+          const sidebar = document.getElementById('sidebar');
+          const toggle = document.getElementById('sidebar-toggle');
+          if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+              if (!sidebar.contains(e.target) && e.target !== toggle) {
+                  sidebar.classList.remove('open');
+              }
+          }
+      });
+
+      // Accessibility: close sidebar with ESC
+      document.addEventListener('keydown', function(e) {
+          if (e.key === "Escape") {
+              document.getElementById('sidebar').classList.remove('open');
+          }
       });
 
       loadData();
